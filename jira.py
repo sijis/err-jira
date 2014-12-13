@@ -1,8 +1,13 @@
 from errbot import BotPlugin, botcmd
 import logging
-import requests
 
 log = logging.getLogger(name='errbot.plugins.Jira')
+
+try:
+    import requests
+except ImportError:
+    log.error("Please install 'requests' python package")
+
 
 class Jira(BotPlugin):
     """Plugin for Jira"""
