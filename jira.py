@@ -1,6 +1,8 @@
 from errbot import BotPlugin, botcmd
+import logging
 import requests
 
+log = logging.getLogger(name='errbot.plugins.Jira')
 
 class Jira(BotPlugin):
     """Plugin for Jira"""
@@ -34,6 +36,7 @@ class Jira(BotPlugin):
         url = '%s/issue/%s' % (api_url, ticket)
         url_display = '%s/browse/%s' % (domain, ticket)
         req = requests.get(url, auth=(username, password))
+        log.debug('api url: {0}'.format(url))
 
         if req.status_code == requests.codes.ok:
             data = req.json()
