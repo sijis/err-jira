@@ -1,6 +1,6 @@
 from errbot import BotPlugin, botcmd
-
 import requests
+
 
 class Jira(BotPlugin):
     """Plugin for Jira"""
@@ -39,11 +39,12 @@ class Jira(BotPlugin):
             data = req.json()
 
             response = '{0} created on {1} by {2} ({4}) - {3}'.format(
-                                data['fields']['summary'],
-                                data['fields']['created'],
-                                data['fields']['reporter']['displayName'],
-                                url_display,
-                                data['fields']['status']['name'])
+                data['fields']['summary'],
+                data['fields']['created'],
+                data['fields']['reporter']['displayName'],
+                url_display,
+                data['fields']['status']['name']
+            )
         else:
             response = 'Issue {0} not found.'.format(ticket)
 
