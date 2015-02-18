@@ -30,7 +30,11 @@ class Jira(BotPlugin):
 
         ticket = args.pop(0)
         if ticket == '':
-            yield 'ticket must be passed'
+            self.send(msg.frm,
+                      'ticket must be passed',
+                      message_type=msg.type,
+                      in_reply_to=msg,
+                      groupchat_nick_reply=True)
             return
 
         username = self.config['api_user']
@@ -56,4 +60,8 @@ class Jira(BotPlugin):
         else:
             response = 'Issue {0} not found.'.format(ticket)
 
-        yield response
+        self.send(msg.frm,
+                  response,
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
