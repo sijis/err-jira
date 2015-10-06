@@ -4,9 +4,9 @@ import logging
 log = logging.getLogger(name='errbot.plugins.Jira')
 
 try:
-    import requests
+    from jira import JIRA, JIRAError
 except ImportError:
-    log.error("Please install 'requests' python package")
+    log.error("Please install 'jira' python package")
 
 
 class Jira(BotPlugin):
@@ -18,9 +18,21 @@ class Jira(BotPlugin):
             'api_url': None,
             'api_user': None,
             'api_pass': None,
-            'domain': None,
         }
         return config
+
+    def _login(self):
+        username = self.config['api_user']
+        password = self.config['api_pass']
+        api_url = self.config['api_url']
+
+        try:
+            login = JIRA(server=api_url, basic_auth=(username, password))
+            log.info('logging into {}'.format(options['server']))
+            return login
+        except JIRAError:
+            self.log.info('Unable to login to {}'.format(api_url))
+            return Exception
 
     @botcmd(split_args_with=' ')
     def jira(self, msg, args):
@@ -31,34 +43,26 @@ class Jira(BotPlugin):
         ticket = args.pop(0)
         if ticket == '':
             self.send(msg.frm,
-                      'ticket must be passed',
+                      'Ticket must be passed',
                       message_type=msg.type,
                       in_reply_to=msg,
                       groupchat_nick_reply=True)
             return
 
-        username = self.config['api_user']
-        password = self.config['api_pass']
-        api_url = self.config['api_url']
-        domain = self.config['domain']
+        jira = self._login()
 
-        url = '%s/issue/%s' % (api_url, ticket)
-        url_display = '%s/browse/%s' % (domain, ticket)
-        req = requests.get(url, auth=(username, password))
-        log.debug('api url: {0}'.format(url))
-
-        if req.status_code == requests.codes.ok:
-            data = req.json()
+        try:
+            issue = jira.issue(ticket)
 
             response = '{0} created on {1} by {2} ({4}) - {3}'.format(
-                data['fields']['summary'],
-                data['fields']['created'],
-                data['fields']['reporter']['displayName'],
-                url_display,
-                data['fields']['status']['name']
+                issue.fields.summary,
+                issue.fields.created,
+                issue.fields.reporter.displayName,
+                issue.permalink(),
+                issue.fields.status.name
             )
-        else:
-            response = 'Issue {0} not found.'.format(ticket)
+        except JIRAError:
+            response = 'Ticket {0} not found.'.format(ticket)
 
         self.send(msg.frm,
                   response,
