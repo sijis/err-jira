@@ -31,8 +31,21 @@ class Jira(BotPlugin):
             log.info('logging into {}'.format(api_url))
             return login
         except JIRAError:
-            self.log.info('Unable to login to {}'.format(api_url))
-            return Exception
+            message = 'Unable to login to {}'.format(api_url)
+            self.log.info(message)
+            return False
+
+    def _check_ticket_passed(self, msg, ticket):
+
+        if ticket == '':
+            self.send(msg.frm,
+                      'Ticket must be passed',
+                      message_type=msg.type,
+                      in_reply_to=msg,
+                      groupchat_nick_reply=True)
+            return False
+
+        return True
 
     @botcmd(split_args_with=' ')
     def jira(self, msg, args):
@@ -41,12 +54,7 @@ class Jira(BotPlugin):
         """
 
         ticket = args.pop(0)
-        if ticket == '':
-            self.send(msg.frm,
-                      'Ticket must be passed',
-                      message_type=msg.type,
-                      in_reply_to=msg,
-                      groupchat_nick_reply=True)
+        if not self._check_ticket_passed(msg, ticket):
             return
 
         jira = self._login()
