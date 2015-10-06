@@ -111,3 +111,35 @@ class Jira(BotPlugin):
                   message_type=msg.type,
                   in_reply_to=msg,
                   groupchat_nick_reply=True)
+
+    @botcmd(split_args_with=' ')
+    def jira_reassign(self, msg, args):
+        """
+        Reassign a ticket to someone else
+        Options:
+            ticket: jira ticket
+            user: user to reassign ticket
+        Example
+        !jira reassign PROJECT-123 sijis
+        """
+
+        ticket = args.pop(0)
+        user = args.pop(0)
+
+        if not self._check_ticket_passed(msg, ticket):
+            return
+
+        jira = self._login()
+
+        try:
+            issue = jira.issue(ticket)
+            issue.update(fields={'assignee': {'name':user}})
+            response = 'Reassigned {} to {}'.format(ticket, user)
+        except JIRAError:
+            response = 'Unable to reassign {} to {}'.format(ticket, user)
+
+        self.send(msg.frm,
+                  response,
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
