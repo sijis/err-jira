@@ -28,7 +28,7 @@ class Jira(BotPlugin):
 
         try:
             login = JIRA(server=api_url, basic_auth=(username, password))
-            log.info('logging into {}'.format(options['server']))
+            log.info('logging into {}'.format(api_url))
             return login
         except JIRAError:
             self.log.info('Unable to login to {}'.format(api_url))
