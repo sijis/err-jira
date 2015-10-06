@@ -77,3 +77,37 @@ class Jira(BotPlugin):
                   message_type=msg.type,
                   in_reply_to=msg,
                   groupchat_nick_reply=True)
+
+    @botcmd(split_args_with=' ')
+    def jira_comment(self, msg, args):
+        """
+        Adds a comment to a ticket
+        Options:
+            ticket: jira ticket
+            comment: text to add to ticket
+        Example
+        !jira comment PROJECT-123 I need to revisit this.
+        """
+
+        ticket = args.pop(0)
+        raw_comment = ' '.join(args)
+
+        if not self._check_ticket_passed(msg, ticket):
+            return
+
+        jira = self._login()
+
+        try:
+            issue = jira.issue(ticket)
+            user = msg.frm
+            comment = '{} added: {}'.format(user, raw_comment)
+            jira.add_comment(issue, comment)
+            response = 'Added comment to {}'.format(ticket)
+        except JIRAError:
+            response = 'Unable to add comment to {0}.'.format(ticket)
+
+        self.send(msg.frm,
+                  response,
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
