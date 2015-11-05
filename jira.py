@@ -33,7 +33,7 @@ class Jira(BotPlugin):
         except JIRAError:
             message = 'Unable to login to {}'.format(api_url)
             self.log.info(message)
-            return False
+            raise Exception(message)
 
     def _check_ticket_passed(self, msg, ticket):
 
