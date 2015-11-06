@@ -12,6 +12,19 @@ except ImportError:
 class Jira(BotPlugin):
     """Plugin for Jira"""
 
+    def activate(self):
+
+        if not self.config:
+            #Don't allow activation until we are configured
+            message = 'Jira is not configured, please do so.'
+            self.log.info(message)
+            self.warn_admins(message)
+            return
+
+        self.jira_connect = self._login()
+        if self.jira_connect:
+            super().activate()
+
     def get_configuration_template(self):
         """ configuration entries """
         config = {
@@ -32,8 +45,8 @@ class Jira(BotPlugin):
             return login
         except JIRAError:
             message = 'Unable to login to {}'.format(api_url)
-            self.log.info(message)
-            raise Exception(message)
+            self.log.error(message)
+            return False
 
     def _check_ticket_passed(self, msg, ticket):
 
@@ -57,7 +70,7 @@ class Jira(BotPlugin):
         if not self._check_ticket_passed(msg, ticket):
             return
 
-        jira = self._login()
+        jira = self.jira_connect
 
         try:
             issue = jira.issue(ticket)
@@ -95,7 +108,7 @@ class Jira(BotPlugin):
         if not self._check_ticket_passed(msg, ticket):
             return
 
-        jira = self._login()
+        jira = self.jira_connect
 
         try:
             issue = jira.issue(ticket)
@@ -129,7 +142,7 @@ class Jira(BotPlugin):
         if not self._check_ticket_passed(msg, ticket):
             return
 
-        jira = self._login()
+        jira = self.jira_connect
 
         try:
             issue = jira.issue(ticket)
