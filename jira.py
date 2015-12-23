@@ -66,7 +66,7 @@ class Jira(BotPlugin):
         Returns the subject of the ticket along with a link to it.
         """
 
-        ticket = args.pop(0)
+        ticket = args.pop(0).upper()
         if not self._check_ticket_passed(msg, ticket):
             return
 
@@ -102,7 +102,7 @@ class Jira(BotPlugin):
         !jira comment PROJECT-123 I need to revisit this.
         """
 
-        ticket = args.pop(0)
+        ticket = args.pop(0).upper()
         raw_comment = ' '.join(args)
 
         if not self._check_ticket_passed(msg, ticket):
@@ -136,7 +136,7 @@ class Jira(BotPlugin):
         !jira reassign PROJECT-123 sijis
         """
 
-        ticket = args.pop(0)
+        ticket = args.pop(0).upper()
         user = args.pop(0)
 
         if not self._check_ticket_passed(msg, ticket):
