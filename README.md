@@ -4,7 +4,7 @@ Err plugin for Jira
 Requirements
 ---
 ```
-pip install requests
+pip install jira
 ```
 
 Installation
