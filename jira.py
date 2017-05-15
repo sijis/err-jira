@@ -145,8 +145,7 @@ class Jira(BotPlugin):
         jira = self.jira_connect
 
         try:
-            issue = jira.issue(ticket)
-            issue.update(fields={'assignee': {'name':user}})
+            jira.assign_issue(assignee=user, issue=ticket)
             response = 'Reassigned {} to {}'.format(ticket, user)
         except JIRAError:
             response = 'Unable to reassign {} to {}'.format(ticket, user)
